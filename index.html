@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blooms Balloons | Luxury Event Planning</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ef93b4;
+            --glitter-pink: #f48fb1;
+            --gold-foil: #d4af37;
+            --deep-slate: #1a1a1a; 
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fffafb;
+            color: var(--deep-slate);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .gold-text {
+            background: linear-gradient(to right, #a67c00, #bf953f, #a67c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .pink-gradient {
+            background: linear-gradient(135deg, #fce4ec 0%, #f48fb1 100%);
+        }
+
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: var(--gold-foil);
+            transition: width .3s;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .balloon-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(239, 147, 180, 0.2);
+        }
+
+        .custom-cursor {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--primary-pink);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease;
+            mix-blend-mode: multiply;
+        }
+
+        #sparkles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .btn-gold {
+            background: linear-gradient(45deg, #bf953f, #d4af37);
+            color: white;
+            box-shadow: 0 4px 15px rgba(191, 149, 63, 0.4);
+        }
+
+        .text-readable {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        /* Carousel Styles */
+        .carousel-container {
+            display: flex;
+            overflow-x: scroll;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+        .carousel-item {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+        }
+        @media (min-width: 768px) {
+            .carousel-item {
+                flex: 0 0 45%;
+                margin-right: 2rem;
+            }
+        }
+
+        .logo-img {
+            object-fit: contain;
+            mix-blend-mode: multiply;
+        }
+        
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+        
+        .carousel-item:hover .gallery-img {
+            transform: scale(1.08);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="custom-cursor hidden md:block" id="cursor"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-morphism py-4 px-6 md:px-12 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <img src="https://imgur.com/noYQiw9.png" alt="Blooms Balloons Logo" class="h-12 w-auto logo-img">
+            <div class="text-xl font-serif font-bold tracking-widest uppercase flex flex-col items-start leading-none">
+                <span class="gold-text">Blooms</span>
+                <span class="text-[8px] block font-sans tracking-[0.4em] font-bold text-pink-600">Balloons</span>
+            </div>
+        </div>
+        <div class="hidden md:flex space-x-10 items-center">
+            <a href="#services" class="nav-link text-xs font-bold uppercase tracking-widest text-gray-900">Services</a>
+            <a href="#gallery" class="nav-link text-xs font-bold uppercase tracking-widest text-gray-900">Gallery</a>
+            <a href="#contact" class="btn-gold px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-md">Enquire</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#fffafb]">
+        <canvas id="sparkles"></canvas>
+
+        <div class="absolute top-[15%] right-[10%] w-64 h-64 pink-gradient rounded-full mix-blend-multiply filter blur-3xl opacity-40 balloon-float"></div>
+        <div class="absolute bottom-[10%] left-[5%] w-80 h-80 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30" style="animation-delay: 2s;"></div>
+
+        <div class="container mx-auto px-6 z-10 text-center flex flex-col items-center justify-center pt-24">
+            <div class="hero-logo-box mb-8 opacity-0">
+                 <div class="inline-block border-2 border-pink-300 p-2 rounded-full mb-4 bg-white/50 backdrop-blur-sm">
+                    <div class="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center shadow-lg bg-white">
+                        <img src="https://imgur.com/noYQiw9.png" alt="Blooms Balloons Main Logo" class="w-24 h-24 logo-img">
+                    </div>
+                 </div>
+                 <p class="text-pink-600 uppercase tracking-[0.4em] text-xs font-extrabold">Let Your Celebration Bloom</p>
+            </div>
+
+            <h1 class="hero-title text-6xl md:text-9xl font-serif leading-tight mb-8">
+                Luxury <span class="gold-text">Balloon</span> <br>
+                <span class="italic text-pink-500">Designers</span>
+            </h1>
+            
+            <p class="hero-subtitle text-lg md:text-xl text-gray-800 max-w-2xl mx-auto mb-12 opacity-0 font-semibold leading-relaxed">
+                We craft bespoke, high-end balloon installations that turn your special day into a masterpiece. Elegant, organic, and uniquely yours.
+            </p>
+            
+            <div class="hero-cta opacity-0 flex flex-col md:flex-row gap-6 justify-center">
+                <a href="#gallery" class="bg-white border-2 border-pink-200 text-pink-600 px-12 py-5 rounded-full font-bold hover:shadow-xl transition-all uppercase tracking-widest text-sm shadow-sm">Our Work</a>
+                <a href="#contact" class="btn-gold px-12 py-5 rounded-full font-bold hover:shadow-2xl transition-all uppercase tracking-widest text-sm">Message Our Team</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Carousel Section -->
+    <section id="gallery" class="py-32 bg-[#fffafb] overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+                <div class="max-w-xl">
+                    <h2 class="text-6xl font-serif mb-6 text-gray-900">Our <span class="gold-text italic">Work</span></h2>
+                    <p class="text-gray-800 font-medium text-lg">A glimpse into the magic we create for weddings, birthdays, and grand openings.</p>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="scrollCarousel(-1)" class="w-14 h-14 rounded-full border-2 border-pink-200 flex items-center justify-center text-pink-500 hover:bg-pink-500 hover:text-white transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <button onclick="scrollCarousel(1)" class="w-14 h-14 rounded-full border-2 border-pink-200 flex items-center justify-center text-pink-500 hover:bg-pink-500 hover:text-white transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="carousel" class="carousel-container pb-12">
+                <!-- Gallery Item 1 -->
+                <div class="carousel-item">
+                    <div class="relative group rounded-[2rem] overflow-hidden h-[500px] shadow-xl bg-white">
+                        <img src="https://imgur.com/OzRTQq2.png" alt="Luxury Pink and Gold Display" class="gallery-img">
+                    </div>
+                </div>
+                <!-- Gallery Item 2 -->
+                <div class="carousel-item">
+                    <div class="relative group rounded-[2rem] overflow-hidden h-[500px] shadow-xl bg-white">
+                        <img src="https://imgur.com/4cdZUeG.png" alt="Bespoke Event Styling" class="gallery-img">
+                    </div>
+                </div>
+                <!-- Gallery Item 3 -->
+                <div class="carousel-item">
+                    <div class="relative group rounded-[2rem] overflow-hidden h-[500px] shadow-xl bg-white">
+                        <img src="https://imgur.com/tvMCxR5.png" alt="Creative Backdrop Design" class="gallery-img">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-32 bg-white relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-24">
+                <h2 class="text-6xl md:text-8xl font-serif mb-6 text-gray-900">Our Services</h2>
+                <div class="w-24 h-1.5 bg-gold-text mx-auto bg-gradient-to-r from-yellow-600 to-yellow-400"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+                <div class="service-card group cursor-pointer text-center">
+                    <div class="relative mb-8 inline-block">
+                        <div class="w-32 h-32 pink-gradient rounded-full flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-4xl font-serif mb-4 italic text-gray-900">Bespoke Arches</h3>
+                    <p class="text-readable text-lg px-6">Tailored organic shapes that flow naturally with your venue's space.</p>
+                </div>
+
+                <div class="service-card group cursor-pointer text-center">
+                    <div class="relative mb-8 inline-block">
+                        <div class="w-32 h-32 bg-yellow-100 rounded-full flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-4xl font-serif mb-4 italic text-gray-900">Glitter Finishes</h3>
+                    <p class="text-readable text-lg px-6">Infusing sparkle and high-shine gold textures into every piece.</p>
+                </div>
+
+                <div class="service-card group cursor-pointer text-center">
+                    <div class="relative mb-8 inline-block">
+                        <div class="w-32 h-32 bg-pink-100 rounded-full flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-4xl font-serif mb-4 italic text-gray-900">Full Styling</h3>
+                    <p class="text-readable text-lg px-6">From tablescapes to backdrop rentals, we handle the complete aesthetic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-[#fffafb]">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto rounded-[3rem] overflow-hidden shadow-2xl bg-white border border-pink-100">
+                <div class="flex flex-col md:flex-row items-stretch">
+                    <div class="md:w-1/2 pink-gradient p-12 md:p-16 flex flex-col justify-center">
+                        <h2 class="text-6xl font-serif mb-6 leading-tight text-gray-900">Message <br><span class="text-pink-700 italic">Our Team</span></h2>
+                        <p class="mb-4 text-gray-800 font-bold text-lg leading-relaxed">Let's create something unforgettable together. Our designers are ready to bring luxury and sparkle to your next event.</p>
+                    </div>
+
+                    <div class="md:w-1/2 p-12 md:p-16 flex flex-col justify-center items-center text-center">
+                        <div class="mb-8">
+                            <div class="w-24 h-24 rounded-full bg-pink-50 flex items-center justify-center mx-auto mb-6 shadow-inner border border-pink-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-4">Start Your Journey</h3>
+                            <p class="text-gray-800 font-medium leading-relaxed">Click below to open your email app and send our designers your vision.</p>
+                        </div>
+                        
+                        <a href="mailto:hello@bloomsballoons.com?subject=New Event Inquiry" class="btn-gold w-full py-6 rounded-full font-extrabold uppercase tracking-[0.15em] text-center hover:scale-105 transition-transform flex items-center justify-center gap-4 text-sm shadow-xl">
+                            <span>Send Your Message</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center text-gray-500 text-xs uppercase tracking-[0.4em] font-bold">
+        &copy; 2024 Blooms Balloons &bull; Elegance in Every Bloom
+    </footer>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX - 12,
+                y: e.clientY - 12,
+                duration: 0.1
+            });
+        });
+
+        const carousel = document.getElementById('carousel');
+        function scrollCarousel(direction) {
+            const scrollAmount = carousel.offsetWidth * 0.8;
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        const canvas = document.getElementById('sparkles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedY = Math.random() * 0.5;
+                this.opacity = Math.random();
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function createParticles() {
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateSparkles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateSparkles);
+        }
+
+        window.onload = () => {
+            initCanvas();
+            createParticles();
+            animateSparkles();
+            
+            gsap.registerPlugin(ScrollTrigger);
+
+            const tl = gsap.timeline();
+            tl.to(".hero-logo-box", { opacity: 1, y: 0, duration: 1, ease: "power3.out" })
+              .from(".hero-title", { y: 50, opacity: 0, duration: 1.2, ease: "power4.out" }, "-=0.5")
+              .to(".hero-subtitle", { opacity: 1, y: -10, duration: 0.8 }, "-=0.8")
+              .to(".hero-cta", { opacity: 1, y: -10, duration: 0.8 }, "-=0.6");
+
+            gsap.from(".service-card", {
+                scrollTrigger: {
+                    trigger: "#services",
+                    start: "top 70%"
+                },
+                y: 60,
+                opacity: 0,
+                stagger: 0.2,
+                duration: 1,
+                ease: "power2.out"
+            });
+
+            gsap.from(".carousel-item", {
+                scrollTrigger: {
+                    trigger: "#gallery",
+                    start: "top 70%"
+                },
+                x: 100,
+                opacity: 0,
+                stagger: 0.15,
+                duration: 1.2,
+                ease: "power3.out"
+            });
+        };
+
+        window.addEventListener('resize', () => {
+            initCanvas();
+            createParticles();
+        });
+    </script>
+</body>
+</html>
